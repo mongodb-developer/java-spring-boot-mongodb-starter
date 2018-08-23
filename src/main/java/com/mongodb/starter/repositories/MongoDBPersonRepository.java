@@ -1,9 +1,9 @@
-package com.mongodb.mongoiot.repositories;
+package com.mongodb.starter.repositories;
 
-import com.mongodb.MongoClient;
+import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.mongoiot.models.Person;
+import com.mongodb.starter.models.Person;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -19,7 +19,7 @@ public class MongoDBPersonRepository implements PersonRepository {
     @Autowired
     public MongoDBPersonRepository(MongoClient mongoClient) {
         MongoDatabase db = mongoClient.getDatabase("test");
-        personCollection = db.getCollection("sensor", Person.class);
+        personCollection = db.getCollection("person", Person.class);
     }
 
     @Override

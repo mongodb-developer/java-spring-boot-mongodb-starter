@@ -1,7 +1,7 @@
-package com.mongodb.mongoiot.controllers;
+package com.mongodb.starter.controllers;
 
-import com.mongodb.mongoiot.models.Person;
-import com.mongodb.mongoiot.repositories.PersonRepository;
+import com.mongodb.starter.models.Person;
+import com.mongodb.starter.repositories.PersonRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

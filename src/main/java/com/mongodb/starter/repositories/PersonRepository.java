@@ -1,6 +1,6 @@
-package com.mongodb.mongoiot.repositories;
+package com.mongodb.starter.repositories;
 
-import com.mongodb.mongoiot.models.Person;
+import com.mongodb.starter.models.Person;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.mongodb.mongoiot;
+package com.mongodb.starter;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
