@@ -3,11 +3,12 @@ package com.mongodb.starter;
 // import com.mongodb.MongoClientOptions;
 // import com.mongodb.MongoClientURI;
 
+import com.mongodb.Block;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
-import com.mongodb.starter.models.Person;
+import com.mongodb.connection.ClusterSettings;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,25 +26,11 @@ public class ConfigurationSpring {
 
     @Bean
     public MongoClient mongoClient() {
-        /*CodecRegistry codecRegistry = fromRegistries(MongoClient.getDefaultCodecRegistry(),
-                                                     fromProviders(PojoCodecProvider.builder().automatic(true).build()));
-
-        MongoClientOptions.Builder options = new MongoClientOptions.Builder().codecRegistry(codecRegistry);
-        MongoClientURI uri = new MongoClientURI(connectionString, options);
-        return new MongoClient(uri);*/
-
-  /*      CodecRegistry pojoCodecRegistry = fromRegistries(MongoClient.getDefaultCodecRegistry(),
-                                                         fromProviders(PojoCodecProvider.builder().automatic(true).build()));*/
-        CodecRegistry pojoCodecRegistry = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(), fromProviders(
-                PojoCodecProvider.builder()
-                                 .register(Person.class)
-                                 .register(Person.Car.class)
-                                 .register(Person.Address.class)
-                                 .automatic(true)
-                                 .build()));
+        CodecRegistry codecRegistry = fromProviders(PojoCodecProvider.builder().automatic(true).build());
+        CodecRegistry pojoCodecRegistry = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(), codecRegistry);
+        Block<ClusterSettings.Builder> connection = b -> b.applyConnectionString(new ConnectionString(connectionString)).build();
         MongoClientSettings settings = MongoClientSettings.builder()
-                                                          .applyToClusterSettings(b -> b.applyConnectionString(
-                                                                  new ConnectionString(connectionString)).build())
+                                                          .applyToClusterSettings(connection)
                                                           .codecRegistry(pojoCodecRegistry)
                                                           .build();
         return MongoClients.create(settings);

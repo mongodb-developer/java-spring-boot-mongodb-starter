@@ -3,7 +3,6 @@ package com.mongodb.starter.models;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.impl.IndexedListSerializer;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import org.bson.types.ObjectId;
 
@@ -22,7 +21,6 @@ public class Person {
     private Address address;
     private Date createdAt = new Date();
     private Boolean insurance;
-    @JsonSerialize(using = IndexedListSerializer.class)
     private List<Car> cars;
 
     public ObjectId getId() {
@@ -122,7 +120,7 @@ public class Person {
         return Objects.hash(id, firstName, lastName, age, address, createdAt, insurance, cars);
     }
 
-    public class Car {
+    public static class Car {
         private String brand;
         private String model;
         private Float maxSpeedKmH;
@@ -179,7 +177,7 @@ public class Person {
         }
     }
 
-    public class Address {
+    public static class Address {
         private int number;
         private String street;
         private String postcode;
