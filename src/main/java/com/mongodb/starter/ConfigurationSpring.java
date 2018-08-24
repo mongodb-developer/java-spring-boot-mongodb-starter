@@ -1,7 +1,4 @@
 package com.mongodb.starter;
-// import com.mongodb.MongoClient;
-// import com.mongodb.MongoClientOptions;
-// import com.mongodb.MongoClientURI;
 
 import com.mongodb.Block;
 import com.mongodb.ConnectionString;
