@@ -1,8 +1,10 @@
 package com.mongodb.starter.repositories;
 
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
+import com.mongodb.ReadConcern;
+import com.mongodb.ReadPreference;
+import com.mongodb.TransactionOptions;
+import com.mongodb.WriteConcern;
+import com.mongodb.client.*;
 import com.mongodb.client.model.ReplaceOneModel;
 import com.mongodb.client.model.WriteModel;
 import com.mongodb.starter.models.Person;
@@ -21,10 +23,17 @@ import static com.mongodb.client.model.Filters.in;
 @Repository
 public class MongoDBPersonRepository implements PersonRepository {
 
+    private static final TransactionOptions txnOptions = TransactionOptions.builder()
+                                                                           .readPreference(ReadPreference.primaryPreferred())
+                                                                           .readConcern(ReadConcern.MAJORITY)
+                                                                           .writeConcern(WriteConcern.MAJORITY)
+                                                                           .build();
     private final MongoCollection<Person> personCollection;
+    private final MongoClient client;
 
     @Autowired
     public MongoDBPersonRepository(MongoClient mongoClient) {
+        client = mongoClient;
         MongoDatabase db = mongoClient.getDatabase("test");
         personCollection = db.getCollection("person", Person.class);
     }
@@ -38,9 +47,16 @@ public class MongoDBPersonRepository implements PersonRepository {
 
     @Override
     public List<Person> saveAll(List<Person> persons) {
-        persons.forEach(p -> p.setId(new ObjectId()));
-        personCollection.insertMany(persons);
-        return persons;
+        List<Person> people;
+        try (ClientSession clientSession = client.startSession()) {
+            persons.forEach(p -> p.setId(new ObjectId()));
+            TransactionBody<List<Person>> txnBody = () -> {
+                personCollection.insertMany(clientSession, persons);
+                return persons;
+            };
+            people = clientSession.withTransaction(txnBody, txnOptions);
+        }
+        return people;
     }
 
     @Override
@@ -71,8 +87,14 @@ public class MongoDBPersonRepository implements PersonRepository {
 
     @Override
     public long delete(List<String> ids) {
+        Long count;
         List<ObjectId> objectIds = ids.stream().map(ObjectId::new).collect(Collectors.toList());
-        return personCollection.deleteMany(in("_id", objectIds)).getDeletedCount();
+        try (ClientSession clientSession = client.startSession()) {
+            TransactionBody<Long> txnBody = () -> personCollection.deleteMany(clientSession, in("_id", objectIds))
+                                                                  .getDeletedCount();
+            count = clientSession.withTransaction(txnBody, txnOptions);
+        }
+        return count;
     }
 
     @Override
@@ -87,9 +109,20 @@ public class MongoDBPersonRepository implements PersonRepository {
 
     @Override
     public long update(List<Person> persons) {
-        List<WriteModel<Person>> writes = new ArrayList<>();
-        persons.forEach(p -> writes.add(new ReplaceOneModel<>(eq("_id", p.getId()), p)));
-        return personCollection.bulkWrite(writes).getModifiedCount();
+        int modifiedCount;
+        List<WriteModel<Person>> writes = persons.stream()
+                                                 .map(p -> new ReplaceOneModel<>(eq("_id", p.getId()), p))
+                                                 .collect(Collectors.toList());
+        try (ClientSession clientSession = client.startSession()) {
+            modifiedCount = clientSession.withTransaction(
+                    () -> personCollection.bulkWrite(clientSession, writes).getModifiedCount(), txnOptions);
+        }
+        return modifiedCount;
+    }
+
+    @Override
+    public double getAverageAge() {
+        return 0;
     }
 
 }

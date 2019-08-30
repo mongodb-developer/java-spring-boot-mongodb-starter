@@ -21,14 +21,14 @@ public class PersonController {
 
     @PostMapping("person")
     public ResponseEntity<Person> postPerson(@RequestBody Person person) {
-        Person saved = personRepository.save(person);
-        return ResponseEntity.ok(saved);
+        Person personSaved = personRepository.save(person);
+        return ResponseEntity.ok(personSaved);
     }
 
     @PostMapping("persons")
     public ResponseEntity<List<Person>> postPersons(@RequestBody List<Person> persons) {
-        List<Person> people = personRepository.saveAll(persons);
-        return ResponseEntity.ok(people);
+        List<Person> personsSaved = personRepository.saveAll(persons);
+        return ResponseEntity.ok(personsSaved);
     }
 
     @GetMapping("persons")
@@ -79,14 +79,19 @@ public class PersonController {
 
     @PutMapping("person")
     public ResponseEntity<Person> putPerson(@RequestBody Person person) {
-        Person updated = personRepository.update(person);
-        return ResponseEntity.ok(updated);
+        Person personUpdated = personRepository.update(person);
+        return ResponseEntity.ok(personUpdated);
     }
 
     @PutMapping("persons")
     public ResponseEntity<Long> putPerson(@RequestBody List<Person> persons) {
-        long updated = personRepository.update(persons);
-        return ResponseEntity.ok(updated);
+        long nbPersonUpdated = personRepository.update(persons);
+        return ResponseEntity.ok(nbPersonUpdated);
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public final ResponseEntity<Exception> handleAllExceptions(RuntimeException e) {
+        return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 }
