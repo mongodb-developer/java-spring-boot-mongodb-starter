@@ -3,6 +3,7 @@ package com.mongodb.starter;
 import com.mongodb.starter.models.Person;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -42,4 +43,7 @@ public class TestHelper {
 
     }
 
+    List<Person> getListMaxAlex() {
+        return Arrays.asList(getMax(), getAlex());
+    }
 }

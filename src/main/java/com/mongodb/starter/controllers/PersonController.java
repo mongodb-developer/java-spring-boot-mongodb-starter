@@ -2,6 +2,8 @@ package com.mongodb.starter.controllers;
 
 import com.mongodb.starter.models.Person;
 import com.mongodb.starter.repositories.PersonRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +15,7 @@ import java.util.List;
 @RequestMapping("/api")
 public class PersonController {
 
+    private final static Logger logger = LoggerFactory.getLogger(PersonController.class);
     private final PersonRepository personRepository;
 
     public PersonController(PersonRepository personRepository) {
@@ -89,8 +92,14 @@ public class PersonController {
         return ResponseEntity.ok(nbPersonUpdated);
     }
 
+    @GetMapping("persons/averageAge")
+    public ResponseEntity<Double> averageAge() {
+        return ResponseEntity.ok(personRepository.getAverageAge());
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public final ResponseEntity<Exception> handleAllExceptions(RuntimeException e) {
+        logger.error("Internal server error.", e);
         return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

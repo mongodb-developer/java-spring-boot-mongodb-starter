@@ -5,10 +5,15 @@ import com.mongodb.ReadPreference;
 import com.mongodb.TransactionOptions;
 import com.mongodb.WriteConcern;
 import com.mongodb.client.*;
+import com.mongodb.client.model.FindOneAndReplaceOptions;
 import com.mongodb.client.model.ReplaceOneModel;
+import com.mongodb.client.model.ReturnDocument;
 import com.mongodb.client.model.WriteModel;
+import com.mongodb.starter.dtos.AverageAgeDTO;
 import com.mongodb.starter.models.Person;
 import org.bson.BsonDocument;
+import org.bson.BsonNull;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -17,8 +22,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.mongodb.client.model.Accumulators.avg;
+import static com.mongodb.client.model.Aggregates.group;
+import static com.mongodb.client.model.Aggregates.project;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.in;
+import static com.mongodb.client.model.Projections.excludeId;
+import static java.util.Arrays.asList;
 
 @Repository
 public class MongoDBPersonRepository implements PersonRepository {
@@ -35,7 +45,7 @@ public class MongoDBPersonRepository implements PersonRepository {
     public MongoDBPersonRepository(MongoClient mongoClient) {
         client = mongoClient;
         MongoDatabase db = mongoClient.getDatabase("test");
-        personCollection = db.getCollection("person", Person.class);
+        personCollection = db.getCollection("persons", Person.class);
     }
 
     @Override
@@ -104,7 +114,9 @@ public class MongoDBPersonRepository implements PersonRepository {
 
     @Override
     public Person update(Person person) {
-        return personCollection.findOneAndReplace(eq("_id", person.getId()), person);
+        FindOneAndReplaceOptions options = new FindOneAndReplaceOptions();
+        options.returnDocument(ReturnDocument.AFTER);
+        return personCollection.findOneAndReplace(eq("_id", person.getId()), person, options);
     }
 
     @Override
@@ -122,7 +134,8 @@ public class MongoDBPersonRepository implements PersonRepository {
 
     @Override
     public double getAverageAge() {
-        return 0;
+        List<Bson> pipeline = asList(group(new BsonNull(), avg("averageAge", "$age")), project(excludeId()));
+        return personCollection.aggregate(pipeline, AverageAgeDTO.class).first().getAverageAge();
     }
 
 }
