@@ -40,11 +40,7 @@ class PersonControllerIT {
 
     @Autowired
     PersonControllerIT(MongoClient mongoClient) {
-        // I need to check if the "persons" collection exists. Some tests require the collection to exist because of the transactions.
-        // TODO Is there a smarter solution?
-        List<String> collections = mongoClient.getDatabase("test").listCollectionNames().into(new ArrayList<>());
-        if (!collections.contains("persons"))
-            mongoClient.getDatabase("test").createCollection("persons");
+        createPersonCollectionIfNotPresent(mongoClient);
     }
 
     @BeforeEach
@@ -77,13 +73,12 @@ class PersonControllerIT {
         // WHEN
         HttpEntity<List<Person>> body = new HttpEntity<>(testHelper.getListMaxAlex());
         ResponseEntity<List<Person>> response = rest.exchange(URL + "/persons", HttpMethod.
-                POST, body, new ParameterizedTypeReference<>() {
+                POST, body, new ParameterizedTypeReference<List<Person>>() {
         });
         // THEN
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).usingElementComparatorIgnoringFields("id", "createdAt")
                                       .containsExactlyInAnyOrder(testHelper.getMax(), testHelper.getAlex());
-
     }
 
     @DisplayName("GET /persons with 2 persons")
@@ -93,7 +88,7 @@ class PersonControllerIT {
         List<Person> personsInserted = personRepository.saveAll(Arrays.asList(testHelper.getMax(), testHelper.getAlex()));
         // WHEN
         ResponseEntity<List<Person>> result = rest.exchange(URL + "/persons", HttpMethod.GET, null,
-                                                            new ParameterizedTypeReference<>() {
+                                                            new ParameterizedTypeReference<List<Person>>() {
                                                             });
         // THEN
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -121,7 +116,7 @@ class PersonControllerIT {
         List<String> idsInserted = personsInserted.stream().map(Person::getId).map(ObjectId::toString).collect(toList());
         // WHEN
         String url = URL + "/persons/" + String.join(",", idsInserted);
-        ResponseEntity<List<Person>> result = rest.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+        ResponseEntity<List<Person>> result = rest.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<Person>>() {
         });
         // THEN
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -148,7 +143,7 @@ class PersonControllerIT {
         ObjectId idInserted = personInserted.getId();
         // WHEN
         ResponseEntity<Long> result = rest.exchange(URL + "/person/" + idInserted.toString(), HttpMethod.DELETE, null,
-                                                    new ParameterizedTypeReference<>() {
+                                                    new ParameterizedTypeReference<Long>() {
                                                     });
         // THEN
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -164,7 +159,7 @@ class PersonControllerIT {
         List<String> idsInserted = personsInserted.stream().map(Person::getId).map(ObjectId::toString).collect(toList());
         // WHEN
         ResponseEntity<Long> result = rest.exchange(URL + "/persons/" + String.join(",", idsInserted), HttpMethod.DELETE, null,
-                                                    new ParameterizedTypeReference<>() {
+                                                    new ParameterizedTypeReference<Long>() {
                                                     });
         // THEN
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -179,7 +174,7 @@ class PersonControllerIT {
         personRepository.saveAll(Arrays.asList(testHelper.getMax(), testHelper.getAlex()));
         // WHEN
         ResponseEntity<Long> result = rest.exchange(URL + "/persons", HttpMethod.DELETE, null,
-                                                    new ParameterizedTypeReference<>() {
+                                                    new ParameterizedTypeReference<Long>() {
                                                     });
         // THEN
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -196,7 +191,7 @@ class PersonControllerIT {
         personInserted.setAge(32);
         personInserted.setInsurance(false);
         HttpEntity<Person> body = new HttpEntity<>(personInserted);
-        ResponseEntity<Person> result = rest.exchange(URL + "/person", HttpMethod.PUT, body, new ParameterizedTypeReference<>() {
+        ResponseEntity<Person> result = rest.exchange(URL + "/person", HttpMethod.PUT, body, new ParameterizedTypeReference<Person>() {
         });
         // THEN
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -217,7 +212,7 @@ class PersonControllerIT {
         personsInserted.get(1).setAge(28);
         personsInserted.get(1).setInsurance(true);
         HttpEntity<List<Person>> body = new HttpEntity<>(personsInserted);
-        ResponseEntity<Long> result = rest.exchange(URL + "/persons", HttpMethod.PUT, body, new ParameterizedTypeReference<>() {
+        ResponseEntity<Long> result = rest.exchange(URL + "/persons", HttpMethod.PUT, body, new ParameterizedTypeReference<Long>() {
         });
         // THEN
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -243,4 +238,11 @@ class PersonControllerIT {
         assertThat(result.getBody()).isEqualTo(29L);
     }
 
+    private void createPersonCollectionIfNotPresent(MongoClient mongoClient) {
+        // This is required because it is not possible to create a new collection within a multi-documents transaction.
+        // Some tests start by inserting 2 documents with a transaction.
+        List<String> collections = mongoClient.getDatabase("test").listCollectionNames().into(new ArrayList<>());
+        if (!collections.contains("persons"))
+            mongoClient.getDatabase("test").createCollection("persons");
+    }
 }

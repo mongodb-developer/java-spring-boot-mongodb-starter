@@ -2,8 +2,8 @@
 
 ## Supported versions:
 
-- Java 12
-- Spring boot 2.1.7.RELEASE
+- Java 8 to 12
+- Spring boot 2.1.8.RELEASE
 - MongoDB 4.2.0
 - MongoDB Java driver 3.11.0
 - Maven 3.6.0
@@ -17,7 +17,7 @@ You have 3 choices:
 #### Use MongoDB Atlas
 
 - Ideally, you will have to spin up a MongoDB 4.2 cluster to avoid surprises.
-- You will need to change the default `spring.data.mongodb.uri` in `application.properties`.
+- You will need to update the default `spring.data.mongodb.uri` in `application.properties`.
 
 #### Use a single node Replica Set in Docker
 
@@ -31,9 +31,11 @@ You have 3 choices:
 
 ## Commands
 
-- Start the server with `mvn spring-boot:run`
-- If you add some Unit Tests, you would start them with `mvn clean test`
-- You can start the end to end tests with `mvn clean integration-test`
+- Start the server in a console with `mvn spring-boot:run`.
+- If you add some Unit Tests, you would start them with `mvn clean test`.
+- You can start the end to end tests with `mvn clean integration-test`.
+- You can build the project with : `mvn clean package`.
+- You can run the project with the fat jar and the embedded Tomcat: `java -jar target/java-spring-boot-mongodb-starter-1.0.0.jar` but I would use a real tomcat in production.
 
 ## Swagger
 - Swagger is already configured in this project in `SwaggerConfig.java`.
