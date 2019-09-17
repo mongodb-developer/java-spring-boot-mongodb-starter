@@ -22,7 +22,7 @@ public class SwaggerConfig extends WebMvcConfigurationSupport {
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2).select()
-                                                      .apis(not(RequestHandlerSelectors.basePackage("org.springframework.boot")))
+                                                      .apis(RequestHandlerSelectors.basePackage("com.mongodb.starter"))
                                                       .paths(PathSelectors.any())
                                                       .build()
                                                       .apiInfo(info());

@@ -1,11 +1,11 @@
 package com.mongodb.starter;
 
 import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoDatabase;
 import com.mongodb.starter.models.Person;
 import com.mongodb.starter.repositories.PersonRepository;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +18,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
@@ -43,7 +43,7 @@ class PersonControllerIT {
         createPersonCollectionIfNotPresent(mongoClient);
     }
 
-    @BeforeEach
+    @PostConstruct
     void setUp() {
         URL = "http://localhost:" + port + "/api";
     }
@@ -60,7 +60,7 @@ class PersonControllerIT {
         // WHEN
         ResponseEntity<Person> result = rest.postForEntity(URL + "/person", testHelper.getMax(), Person.class);
         // THEN
-        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         Person personResult = result.getBody();
         assertThat(personResult.getId()).isNotNull();
         assertThat(personResult).isEqualToIgnoringGivenFields(testHelper.getMax(), "id", "createdAt");
@@ -76,16 +76,16 @@ class PersonControllerIT {
                 POST, body, new ParameterizedTypeReference<List<Person>>() {
         });
         // THEN
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(response.getBody()).usingElementComparatorIgnoringFields("id", "createdAt")
-                                      .containsExactlyInAnyOrder(testHelper.getMax(), testHelper.getAlex());
+                                      .containsExactlyInAnyOrderElementsOf(testHelper.getListMaxAlex());
     }
 
     @DisplayName("GET /persons with 2 persons")
     @Test
     void getPersons() {
         // GIVEN
-        List<Person> personsInserted = personRepository.saveAll(Arrays.asList(testHelper.getMax(), testHelper.getAlex()));
+        List<Person> personsInserted = personRepository.saveAll(testHelper.getListMaxAlex());
         // WHEN
         ResponseEntity<List<Person>> result = rest.exchange(URL + "/persons", HttpMethod.GET, null,
                                                             new ParameterizedTypeReference<List<Person>>() {
@@ -99,7 +99,7 @@ class PersonControllerIT {
     @Test
     void getPersonById() {
         // GIVEN
-        Person personInserted = personRepository.save(testHelper.getMax());
+        Person personInserted = personRepository.save(testHelper.getAlex());
         ObjectId idInserted = personInserted.getId();
         // WHEN
         ResponseEntity<Person> result = rest.getForEntity(URL + "/person/" + idInserted, Person.class);
@@ -112,7 +112,7 @@ class PersonControllerIT {
     @Test
     void getPersonsByIds() {
         // GIVEN
-        List<Person> personsInserted = personRepository.saveAll(Arrays.asList(testHelper.getMax(), testHelper.getAlex()));
+        List<Person> personsInserted = personRepository.saveAll(testHelper.getListMaxAlex());
         List<String> idsInserted = personsInserted.stream().map(Person::getId).map(ObjectId::toString).collect(toList());
         // WHEN
         String url = URL + "/persons/" + String.join(",", idsInserted);
@@ -127,7 +127,7 @@ class PersonControllerIT {
     @Test
     void getCount() {
         // GIVEN
-        personRepository.saveAll(Arrays.asList(testHelper.getMax(), testHelper.getAlex()));
+        personRepository.saveAll(testHelper.getListMaxAlex());
         // WHEN
         ResponseEntity<Long> result = rest.getForEntity(URL + "/persons/count", Long.class);
         // THEN
@@ -155,7 +155,7 @@ class PersonControllerIT {
     @Test
     void deletePersonsByIds() {
         // GIVEN
-        List<Person> personsInserted = personRepository.saveAll(Arrays.asList(testHelper.getMax(), testHelper.getAlex()));
+        List<Person> personsInserted = personRepository.saveAll(testHelper.getListMaxAlex());
         List<String> idsInserted = personsInserted.stream().map(Person::getId).map(ObjectId::toString).collect(toList());
         // WHEN
         ResponseEntity<Long> result = rest.exchange(URL + "/persons/" + String.join(",", idsInserted), HttpMethod.DELETE, null,
@@ -171,7 +171,7 @@ class PersonControllerIT {
     @Test
     void deletePersons() {
         // GIVEN
-        personRepository.saveAll(Arrays.asList(testHelper.getMax(), testHelper.getAlex()));
+        personRepository.saveAll(testHelper.getListMaxAlex());
         // WHEN
         ResponseEntity<Long> result = rest.exchange(URL + "/persons", HttpMethod.DELETE, null,
                                                     new ParameterizedTypeReference<Long>() {
@@ -205,7 +205,7 @@ class PersonControllerIT {
     @Test
     void putPersons() {
         // GIVEN
-        List<Person> personsInserted = personRepository.saveAll(Arrays.asList(testHelper.getMax(), testHelper.getAlex()));
+        List<Person> personsInserted = personRepository.saveAll(testHelper.getListMaxAlex());
         // WHEN
         personsInserted.get(0).setAge(32);
         personsInserted.get(0).setInsurance(false);
@@ -230,7 +230,7 @@ class PersonControllerIT {
     @Test
     void getAverageAge() {
         // GIVEN
-        personRepository.saveAll(Arrays.asList(testHelper.getMax(), testHelper.getAlex()));
+        personRepository.saveAll(testHelper.getListMaxAlex());
         // WHEN
         ResponseEntity<Long> result = rest.getForEntity(URL + "/persons/averageAge", Long.class);
         // THEN
@@ -241,8 +241,8 @@ class PersonControllerIT {
     private void createPersonCollectionIfNotPresent(MongoClient mongoClient) {
         // This is required because it is not possible to create a new collection within a multi-documents transaction.
         // Some tests start by inserting 2 documents with a transaction.
-        List<String> collections = mongoClient.getDatabase("test").listCollectionNames().into(new ArrayList<>());
-        if (!collections.contains("persons"))
-            mongoClient.getDatabase("test").createCollection("persons");
+        MongoDatabase db = mongoClient.getDatabase("test");
+        if (!db.listCollectionNames().into(new ArrayList<>()).contains("persons"))
+            db.createCollection("persons");
     }
 }

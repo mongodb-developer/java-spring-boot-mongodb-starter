@@ -8,14 +8,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api")
 public class PersonController {
 
-    private final static Logger logger = LoggerFactory.getLogger(PersonController.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(PersonController.class);
     private final PersonRepository personRepository;
 
     public PersonController(PersonRepository personRepository) {
@@ -23,21 +22,20 @@ public class PersonController {
     }
 
     @PostMapping("person")
-    public ResponseEntity<Person> postPerson(@RequestBody Person person) {
-        Person personSaved = personRepository.save(person);
-        return ResponseEntity.ok(personSaved);
+    @ResponseStatus(HttpStatus.CREATED)
+    public Person postPerson(@RequestBody Person person) {
+        return personRepository.save(person);
     }
 
     @PostMapping("persons")
-    public ResponseEntity<List<Person>> postPersons(@RequestBody List<Person> persons) {
-        List<Person> personsSaved = personRepository.saveAll(persons);
-        return ResponseEntity.ok(personsSaved);
+    @ResponseStatus(HttpStatus.CREATED)
+    public List<Person> postPersons(@RequestBody List<Person> persons) {
+        return personRepository.saveAll(persons);
     }
 
     @GetMapping("persons")
-    public ResponseEntity<List<Person>> getPersons() {
-        List<Person> persons = personRepository.findAll();
-        return ResponseEntity.ok(persons);
+    public List<Person> getPersons() {
+        return personRepository.findAll();
     }
 
     @GetMapping("person/{id}")
@@ -49,58 +47,52 @@ public class PersonController {
     }
 
     @GetMapping("persons/{ids}")
-    public ResponseEntity<List<Person>> getPersons(@PathVariable String ids) {
-        List<String> listIds = Arrays.asList(ids.split(","));
-        List<Person> persons = personRepository.findAll(listIds);
-        return ResponseEntity.ok(persons);
+    public List<Person> getPersons(@PathVariable String ids) {
+        List<String> listIds = List.of(ids.split(","));
+        return personRepository.findAll(listIds);
     }
 
     @GetMapping("persons/count")
-    public ResponseEntity<Long> getCount() {
-        Long count = personRepository.count();
-        return ResponseEntity.ok(count);
+    public Long getCount() {
+        return personRepository.count();
     }
 
     @DeleteMapping("person/{id}")
-    public ResponseEntity<Long> deletePerson(@PathVariable String id) {
-        long nbPersonDeleted = personRepository.delete(id);
-        return ResponseEntity.ok(nbPersonDeleted);
+    public Long deletePerson(@PathVariable String id) {
+        return personRepository.delete(id);
     }
 
     @DeleteMapping("persons/{ids}")
-    public ResponseEntity<Long> deletePersons(@PathVariable String ids) {
-        List<String> listIds = Arrays.asList(ids.split(","));
-        long nbPersonDeleted = personRepository.delete(listIds);
-        return ResponseEntity.ok(nbPersonDeleted);
+    public Long deletePersons(@PathVariable String ids) {
+        List<String> listIds = List.of(ids.split(","));
+        return personRepository.delete(listIds);
     }
 
     @DeleteMapping("persons")
-    public ResponseEntity<Long> deletePersons() {
-        long nbPersonDeleted = personRepository.deleteAll();
-        return ResponseEntity.ok(nbPersonDeleted);
+    public Long deletePersons() {
+        return personRepository.deleteAll();
     }
 
     @PutMapping("person")
-    public ResponseEntity<Person> putPerson(@RequestBody Person person) {
-        Person personUpdated = personRepository.update(person);
-        return ResponseEntity.ok(personUpdated);
+    public Person putPerson(@RequestBody Person person) {
+        return personRepository.update(person);
     }
 
     @PutMapping("persons")
-    public ResponseEntity<Long> putPerson(@RequestBody List<Person> persons) {
-        long nbPersonUpdated = personRepository.update(persons);
-        return ResponseEntity.ok(nbPersonUpdated);
+    public Long putPerson(@RequestBody List<Person> persons) {
+        return personRepository.update(persons);
     }
 
     @GetMapping("persons/averageAge")
-    public ResponseEntity<Double> averageAge() {
-        return ResponseEntity.ok(personRepository.getAverageAge());
+    public Double averageAge() {
+        return personRepository.getAverageAge();
     }
 
     @ExceptionHandler(RuntimeException.class)
-    public final ResponseEntity<Exception> handleAllExceptions(RuntimeException e) {
-        logger.error("Internal server error.", e);
-        return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public final Exception handleAllExceptions(RuntimeException e) {
+        LOGGER.error("Internal server error.", e);
+        return e;
     }
 
 }
