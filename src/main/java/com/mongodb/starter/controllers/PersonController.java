@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static java.util.Arrays.asList;
+
 @RestController
 @RequestMapping("/api")
 public class PersonController {
@@ -48,7 +50,7 @@ public class PersonController {
 
     @GetMapping("persons/{ids}")
     public List<Person> getPersons(@PathVariable String ids) {
-        List<String> listIds = List.of(ids.split(","));
+        List<String> listIds = asList(ids.split(","));
         return personRepository.findAll(listIds);
     }
 
@@ -64,7 +66,7 @@ public class PersonController {
 
     @DeleteMapping("persons/{ids}")
     public Long deletePersons(@PathVariable String ids) {
-        List<String> listIds = List.of(ids.split(","));
+        List<String> listIds = asList(ids.split(","));
         return personRepository.delete(listIds);
     }
 
@@ -94,5 +96,4 @@ public class PersonController {
         LOGGER.error("Internal server error.", e);
         return e;
     }
-
 }

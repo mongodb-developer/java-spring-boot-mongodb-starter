@@ -31,6 +31,7 @@ import static com.mongodb.client.model.Aggregates.project;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.in;
 import static com.mongodb.client.model.Projections.excludeId;
+import static java.util.Arrays.asList;
 
 @Repository
 public class MongoDBPersonRepository implements PersonRepository {
@@ -95,8 +96,9 @@ public class MongoDBPersonRepository implements PersonRepository {
     @Override
     public long delete(List<String> ids) {
         try (ClientSession clientSession = client.startSession()) {
-            return clientSession.withTransaction(() -> personCollection.deleteMany(clientSession, in("_id", mapToObjectIds(ids)))
-                                                                       .getDeletedCount(), txnOptions);
+            return clientSession.withTransaction(
+                    () -> personCollection.deleteMany(clientSession, in("_id", mapToObjectIds(ids))).getDeletedCount(),
+                    txnOptions);
         }
     }
 
@@ -125,10 +127,9 @@ public class MongoDBPersonRepository implements PersonRepository {
 
     @Override
     public double getAverageAge() {
-        List<Bson> pipeline = List.of(group(new BsonNull(), avg("averageAge", "$age")), project(excludeId()));
+        List<Bson> pipeline = asList(group(new BsonNull(), avg("averageAge", "$age")), project(excludeId()));
         return personCollection.aggregate(pipeline, AverageAgeDTO.class).first().getAverageAge();
     }
-
 
     private List<ObjectId> mapToObjectIds(List<String> ids) {
         return ids.stream().map(ObjectId::new).collect(Collectors.toList());
