@@ -14,7 +14,7 @@ public class Car {
         return brand;
     }
 
-    public com.mongodb.starter.models.Car setBrand(String brand) {
+    public Car setBrand(String brand) {
         this.brand = brand;
         return this;
     }
@@ -23,7 +23,7 @@ public class Car {
         return model;
     }
 
-    public com.mongodb.starter.models.Car setModel(String model) {
+    public Car setModel(String model) {
         this.model = model;
         return this;
     }
@@ -32,7 +32,7 @@ public class Car {
         return maxSpeedKmH;
     }
 
-    public com.mongodb.starter.models.Car setMaxSpeedKmH(Float maxSpeedKmH) {
+    public Car setMaxSpeedKmH(Float maxSpeedKmH) {
         this.maxSpeedKmH = maxSpeedKmH;
         return this;
     }
@@ -48,7 +48,7 @@ public class Car {
             return true;
         if (o == null || getClass() != o.getClass())
             return false;
-        com.mongodb.starter.models.Car car = (com.mongodb.starter.models.Car) o;
+        Car car = (Car) o;
         return Objects.equals(brand, car.brand) && Objects.equals(model, car.model) && Objects.equals(maxSpeedKmH,
                                                                                                       car.maxSpeedKmH);
     }

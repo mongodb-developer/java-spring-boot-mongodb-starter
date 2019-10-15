@@ -9,7 +9,6 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.FindOneAndReplaceOptions;
 import com.mongodb.client.model.ReplaceOneModel;
-import com.mongodb.client.model.ReturnDocument;
 import com.mongodb.client.model.WriteModel;
 import com.mongodb.starter.dtos.AverageAgeDTO;
 import com.mongodb.starter.models.Person;
@@ -31,6 +30,7 @@ import static com.mongodb.client.model.Aggregates.project;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.in;
 import static com.mongodb.client.model.Projections.excludeId;
+import static com.mongodb.client.model.ReturnDocument.AFTER;
 import static java.util.Arrays.asList;
 
 @Repository
@@ -104,13 +104,16 @@ public class MongoDBPersonRepository implements PersonRepository {
 
     @Override
     public long deleteAll() {
-        return personCollection.deleteMany(new BsonDocument()).getDeletedCount();
+        try (ClientSession clientSession = client.startSession()) {
+            return clientSession.withTransaction(
+                    () -> personCollection.deleteMany(clientSession, new BsonDocument()).getDeletedCount(), txnOptions);
+        }
     }
 
     @Override
     public Person update(Person person) {
         FindOneAndReplaceOptions options = new FindOneAndReplaceOptions();
-        options.returnDocument(ReturnDocument.AFTER);
+        options.returnDocument(AFTER);
         return personCollection.findOneAndReplace(eq("_id", person.getId()), person, options);
     }
 

@@ -70,8 +70,8 @@ public class Address {
             return false;
         Address address = (Address) o;
         return number == address.number && Objects.equals(street, address.street) && Objects.equals(postcode,
-                                                                                                    address.postcode) && Objects.equals(
-                city, address.city) && Objects.equals(country, address.country);
+                                                                                                    address.postcode) && Objects
+                .equals(city, address.city) && Objects.equals(country, address.country);
     }
 
     @Override
