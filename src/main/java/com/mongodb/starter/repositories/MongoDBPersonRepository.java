@@ -112,8 +112,7 @@ public class MongoDBPersonRepository implements PersonRepository {
 
     @Override
     public Person update(Person person) {
-        FindOneAndReplaceOptions options = new FindOneAndReplaceOptions();
-        options.returnDocument(AFTER);
+        FindOneAndReplaceOptions options = new FindOneAndReplaceOptions().returnDocument(AFTER);
         return personCollection.findOneAndReplace(eq("_id", person.getId()), person, options);
     }
 
