@@ -3,31 +3,16 @@
 ## Supported versions:
 
 - Java 8 to 12
-- Spring boot 2.1.8.RELEASE
-- MongoDB 4.2.0
+- Spring boot 2.1.9.RELEASE
+- MongoDB 4.2.1
 - MongoDB Java driver 3.11.0
-- Maven 3.6.0
+- Maven 3.6.2
 
-## MongoDB
+## MongoDB Atlas
 
-Of course, you will need MongoDB to use this project.
-
-You have 3 choices:
-
-#### Use MongoDB Atlas
-
-- Ideally, you will have to spin up a MongoDB 4.2 cluster to avoid surprises.
-- You will need to update the default `spring.data.mongodb.uri` in `application.properties`.
-
-#### Use a single node Replica Set in Docker
-
-- You need at least a single node Replica Set for the ACID transactions.
-- `startMongoDBDocker.sh` to start...
-- `stopMongoDBDocker.sh` to stop.
-
-#### Use something else
-- DIY :-).
-- If you are thinking about using some "MongoDB fake copycat". This is going to fail miserably. They don't support transactions to say the least.
+ - Get started with a Free Tier Cluster on [MongoDB Atlas](http://bit.ly/mongodb-meetatlas).
+ - Read this blog post: [Quick Start - Getting your Free MongoDB Atlas Cluster](https://www.mongodb.com/blog/post/quick-start-getting-your-free-mongodb-atlas-cluster).
+- You will need to update the default MongoDB URI `spring.data.mongodb.uri` in the `application.properties` file.
 
 ## Commands
 
