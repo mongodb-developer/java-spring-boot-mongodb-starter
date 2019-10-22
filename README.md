@@ -2,10 +2,10 @@
 
 ## Supported versions:
 
-- Java 8 to 12
-- Spring boot 2.1.9.RELEASE
+- Java 8 to 13
+- Spring boot 2.2.0.RELEASE
 - MongoDB 4.2.1
-- MongoDB Java driver 3.11.0
+- MongoDB Java driver 3.11.1
 - Maven 3.6.2
 
 ## MongoDB Atlas
