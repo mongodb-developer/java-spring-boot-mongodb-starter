@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 
 @Component
 class TestHelper {
@@ -22,9 +23,7 @@ class TestHelper {
                                                     .setStreet("The Best Street"))
                            .setAge(31)
                            .setInsurance(true)
-                           .setCars(asList(new Car().setBrand("Ferrari")
-                                                    .setMaxSpeedKmH(339f)
-                                                    .setModel("SF90 Stradale")));
+                           .setCars(singletonList(new Car().setBrand("Ferrari").setMaxSpeedKmH(339f).setModel("SF90 Stradale")));
     }
 
     Person getAlex() {
@@ -37,7 +36,7 @@ class TestHelper {
                                                     .setStreet("Another Street"))
                            .setAge(27)
                            .setInsurance(false)
-                           .setCars(asList(new Car().setBrand("Mercedes").setMaxSpeedKmH(355f).setModel("Project One")));
+                           .setCars(singletonList(new Car().setBrand("Mercedes").setMaxSpeedKmH(355f).setModel("Project One")));
     }
 
     List<Person> getListMaxAlex() {

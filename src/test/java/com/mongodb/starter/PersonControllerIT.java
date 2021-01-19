@@ -63,7 +63,7 @@ class PersonControllerIT {
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         Person personResult = result.getBody();
         assertThat(personResult.getId()).isNotNull();
-        assertThat(personResult).isEqualToIgnoringGivenFields(testHelper.getMax(), "id", "createdAt");
+        assertThat(personResult).usingRecursiveComparison().ignoringFields("id", "createdAt").isEqualTo(testHelper.getMax());
     }
 
     @DisplayName("POST /persons with 2 person")
@@ -116,8 +116,9 @@ class PersonControllerIT {
         List<String> idsInserted = personsInserted.stream().map(Person::getId).map(ObjectId::toString).collect(toList());
         // WHEN
         String url = URL + "/persons/" + String.join(",", idsInserted);
-        ResponseEntity<List<Person>> result = rest.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<Person>>() {
-        });
+        ResponseEntity<List<Person>> result = rest.exchange(url, HttpMethod.GET, null,
+                                                            new ParameterizedTypeReference<List<Person>>() {
+                                                            });
         // THEN
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(result.getBody()).containsExactlyInAnyOrderElementsOf(personsInserted);
@@ -191,8 +192,9 @@ class PersonControllerIT {
         personInserted.setAge(32);
         personInserted.setInsurance(false);
         HttpEntity<Person> body = new HttpEntity<>(personInserted);
-        ResponseEntity<Person> result = rest.exchange(URL + "/person", HttpMethod.PUT, body, new ParameterizedTypeReference<Person>() {
-        });
+        ResponseEntity<Person> result = rest.exchange(URL + "/person", HttpMethod.PUT, body,
+                                                      new ParameterizedTypeReference<Person>() {
+                                                      });
         // THEN
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(result.getBody()).isEqualTo(personRepository.findOne(personInserted.getId().toString()));
@@ -212,8 +214,9 @@ class PersonControllerIT {
         personsInserted.get(1).setAge(28);
         personsInserted.get(1).setInsurance(true);
         HttpEntity<List<Person>> body = new HttpEntity<>(personsInserted);
-        ResponseEntity<Long> result = rest.exchange(URL + "/persons", HttpMethod.PUT, body, new ParameterizedTypeReference<Long>() {
-        });
+        ResponseEntity<Long> result = rest.exchange(URL + "/persons", HttpMethod.PUT, body,
+                                                    new ParameterizedTypeReference<Long>() {
+                                                    });
         // THEN
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(result.getBody()).isEqualTo(2L);

@@ -16,7 +16,6 @@ import org.bson.BsonDocument;
 import org.bson.BsonNull;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
@@ -41,9 +40,12 @@ public class MongoDBPersonRepository implements PersonRepository {
                                                                            .readConcern(ReadConcern.MAJORITY)
                                                                            .writeConcern(WriteConcern.MAJORITY)
                                                                            .build();
-    @Autowired
-    private MongoClient client;
+    private final MongoClient client;
     private MongoCollection<Person> personCollection;
+
+    public MongoDBPersonRepository(MongoClient mongoClient) {
+        this.client = mongoClient;
+    }
 
     @PostConstruct
     void init() {
