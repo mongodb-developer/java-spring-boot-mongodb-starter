@@ -1,7 +1,7 @@
 package com.mongodb.starter.controllers;
 
-import com.mongodb.starter.models.Person;
-import com.mongodb.starter.repositories.PersonRepository;
+import com.mongodb.starter.dtos.PersonDTO;
+import com.mongodb.starter.services.PersonService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -10,84 +10,81 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static java.util.Arrays.asList;
-
 @RestController
 @RequestMapping("/api")
 public class PersonController {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(PersonController.class);
-    private final PersonRepository personRepository;
+    private final PersonService personService;
 
-    public PersonController(PersonRepository personRepository) {
-        this.personRepository = personRepository;
+    public PersonController(PersonService personService) {
+        this.personService = personService;
     }
 
     @PostMapping("person")
     @ResponseStatus(HttpStatus.CREATED)
-    public Person postPerson(@RequestBody Person person) {
-        return personRepository.save(person);
+    public PersonDTO postPerson(@RequestBody PersonDTO PersonDTO) {
+        return personService.save(PersonDTO);
     }
 
     @PostMapping("persons")
     @ResponseStatus(HttpStatus.CREATED)
-    public List<Person> postPersons(@RequestBody List<Person> persons) {
-        return personRepository.saveAll(persons);
+    public List<PersonDTO> postPersons(@RequestBody List<PersonDTO> personEntities) {
+        return personService.saveAll(personEntities);
     }
 
     @GetMapping("persons")
-    public List<Person> getPersons() {
-        return personRepository.findAll();
+    public List<PersonDTO> getPersons() {
+        return personService.findAll();
     }
 
     @GetMapping("person/{id}")
-    public ResponseEntity<Person> getPerson(@PathVariable String id) {
-        Person person = personRepository.findOne(id);
-        if (person == null)
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        return ResponseEntity.ok(person);
+    public ResponseEntity<PersonDTO> getPerson(@PathVariable String id) {
+        PersonDTO PersonDTO = personService.findOne(id);
+        if (PersonDTO == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        return ResponseEntity.ok(PersonDTO);
     }
 
     @GetMapping("persons/{ids}")
-    public List<Person> getPersons(@PathVariable String ids) {
-        List<String> listIds = asList(ids.split(","));
-        return personRepository.findAll(listIds);
+    public List<PersonDTO> getPersons(@PathVariable String ids) {
+        List<String> listIds = List.of(ids.split(","));
+        return personService.findAll(listIds);
     }
 
     @GetMapping("persons/count")
     public Long getCount() {
-        return personRepository.count();
+        return personService.count();
     }
 
     @DeleteMapping("person/{id}")
     public Long deletePerson(@PathVariable String id) {
-        return personRepository.delete(id);
+        return personService.delete(id);
     }
 
     @DeleteMapping("persons/{ids}")
     public Long deletePersons(@PathVariable String ids) {
-        List<String> listIds = asList(ids.split(","));
-        return personRepository.delete(listIds);
+        List<String> listIds = List.of(ids.split(","));
+        return personService.delete(listIds);
     }
 
     @DeleteMapping("persons")
     public Long deletePersons() {
-        return personRepository.deleteAll();
+        return personService.deleteAll();
     }
 
     @PutMapping("person")
-    public Person putPerson(@RequestBody Person person) {
-        return personRepository.update(person);
+    public PersonDTO putPerson(@RequestBody PersonDTO PersonDTO) {
+        return personService.update(PersonDTO);
     }
 
     @PutMapping("persons")
-    public Long putPerson(@RequestBody List<Person> persons) {
-        return personRepository.update(persons);
+    public Long putPerson(@RequestBody List<PersonDTO> personEntities) {
+        return personService.update(personEntities);
     }
 
     @GetMapping("persons/averageAge")
     public Double averageAge() {
-        return personRepository.getAverageAge();
+        return personService.getAverageAge();
     }
 
     @ExceptionHandler(RuntimeException.class)

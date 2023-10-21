@@ -14,7 +14,7 @@ import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 @Configuration
-public class SpringConfiguration {
+public class MongoDBConfiguration {
 
     @Value("${spring.data.mongodb.uri}")
     private String connectionString;

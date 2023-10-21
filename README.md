@@ -2,12 +2,12 @@
 
 ## Supported versions:
 
-- Java 8 to 15
-- Spring boot 2.4.2
-- MongoDB 4.4.3
-- MongoDB Java driver 4.1.1
-- Maven 3.6.3
-- Swagger 3.0.0
+- Java 17
+- Spring boot 3.1.5
+- MongoDB 7.0
+- MongoDB Java driver 4.11.0
+- Maven 3.8.7
+- OpenAPI 3
 
 ## MongoDB Atlas
 
@@ -19,15 +19,15 @@
 
 - Start the server in a console with `mvn spring-boot:run`.
 - If you add some Unit Tests, you would start them with `mvn clean test`.
-- You can start the end to end tests with `mvn clean integration-test`.
+- You can start the end-to-end tests with `mvn clean integration-test`.
 - You can build the project with : `mvn clean package`.
 - You can run the project with the fat jar and the embedded Tomcat: `java -jar target/java-spring-boot-mongodb-starter-1.0.0.jar` but I would use a real tomcat in production.
 
 ## Swagger 3
 - Swagger 3 is already configured in this project in `SpringFoxConfig.java`.
 - The Swagger UI can be seen at [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html).
-- The Swagger API documentation 2.0 is at [http://localhost:8080/v2/api-docs](http://localhost:8080/v2/api-docs).
-- The Open API documentation 3.0.3 is at [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs).
+- The JSON Open API documentation 3.0.1 is at [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs).
+- The YAML Open API documentation 3.0.1 is at [http://localhost:8080/v3/api-docs.yaml](http://localhost:8080/v3/api-docs.yaml).
 - You can also try the entire REST API directly from the Swagger interface!
 
 ## Features showcase
@@ -37,11 +37,44 @@ This project showcases several features of MongoDB:
 - MongoDB Aggregation pipeline. See `MongoDBPersonRepository.getAverageAge()`.
 - Implementation of basic CRUD queries. See `MongoDBPersonRepository.java`.
 - MongoDB typed collection with automatic mapping to POJOs using codecs: See `ConfigurationSpring.java`.
-- How to manipulate correctly ObjectidId across, the REST API, the POJOs and the database itself. See the main trick in `Person.java`.
+- How to manipulate correctly ObjectId across, the REST API, the POJOs and the database itself. See the main trick in `Person.java`.
 
 And some other cool stuff:
 - You can change the default Spring Boot logo by adding a banner.txt file in your properties.
 - You don't have to use Spring Data MongoDB. The MongoDB driver is more flexible and already provides everything you need to code efficiently and optimise your queries correctly.
+
+## Example API Calls
+
+```bash
+curl -X 'POST' \
+  'http://localhost:8080/api/person' \
+  -H 'accept: */*' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "firstName": "Maxime",
+  "lastName": "Beugnet",
+  "age": 35,
+  "address": {
+    "number": 123,
+    "street": "avenue des Champs-Elysées",
+    "postcode": "75000",
+    "city": "Paris",
+    "country": "France"
+  },
+  "insurance": true,
+  "cars": [
+    {
+      "brand": "Peugeot",
+      "model": "3008",
+      "maxSpeedKmH": 280
+    }
+  ]
+}'
+```
+
+```bash
+curl -X 'GET' 'http://localhost:8080/api/persons' -H 'accept: */*'
+```
 
 ## Author
 - Maxime Beugnet @ MongoDB.

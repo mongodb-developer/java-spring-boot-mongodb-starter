@@ -2,21 +2,29 @@ package com.mongodb.starter.models;
 
 import java.util.Objects;
 
-public class Address {
+public class AddressEntity {
     private int number;
     private String street;
     private String postcode;
     private String city;
     private String country;
 
-    public Address() {
+    public AddressEntity() {
+    }
+
+    public AddressEntity(int number, String street, String postcode, String city, String country) {
+        this.number = number;
+        this.street = street;
+        this.postcode = postcode;
+        this.city = city;
+        this.country = country;
     }
 
     public int getNumber() {
         return number;
     }
 
-    public Address setNumber(int number) {
+    public AddressEntity setNumber(int number) {
         this.number = number;
         return this;
     }
@@ -25,7 +33,7 @@ public class Address {
         return street;
     }
 
-    public Address setStreet(String street) {
+    public AddressEntity setStreet(String street) {
         this.street = street;
         return this;
     }
@@ -34,7 +42,7 @@ public class Address {
         return postcode;
     }
 
-    public Address setPostcode(String postcode) {
+    public AddressEntity setPostcode(String postcode) {
         this.postcode = postcode;
         return this;
     }
@@ -43,7 +51,7 @@ public class Address {
         return city;
     }
 
-    public Address setCity(String city) {
+    public AddressEntity setCity(String city) {
         this.city = city;
         return this;
     }
@@ -52,7 +60,7 @@ public class Address {
         return country;
     }
 
-    public Address setCountry(String country) {
+    public AddressEntity setCountry(String country) {
         this.country = country;
         return this;
     }
@@ -64,14 +72,12 @@ public class Address {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        Address address = (Address) o;
-        return number == address.number && Objects.equals(street, address.street) && Objects.equals(postcode,
-                                                                                                    address.postcode) && Objects
-                .equals(city, address.city) && Objects.equals(country, address.country);
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AddressEntity addressEntity = (AddressEntity) o;
+        return number == addressEntity.number && Objects.equals(street, addressEntity.street) && Objects.equals(
+                postcode, addressEntity.postcode) && Objects.equals(city, addressEntity.city) && Objects.equals(country,
+                                                                                                                addressEntity.country);
     }
 
     @Override

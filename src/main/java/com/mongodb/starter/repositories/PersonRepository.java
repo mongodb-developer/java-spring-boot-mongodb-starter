@@ -1,6 +1,6 @@
 package com.mongodb.starter.repositories;
 
-import com.mongodb.starter.models.Person;
+import com.mongodb.starter.models.PersonEntity;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -8,15 +8,15 @@ import java.util.List;
 @Repository
 public interface PersonRepository {
 
-    Person save(Person person);
+    PersonEntity save(PersonEntity personEntity);
 
-    List<Person> saveAll(List<Person> persons);
+    List<PersonEntity> saveAll(List<PersonEntity> personEntities);
 
-    List<Person> findAll();
+    List<PersonEntity> findAll();
 
-    List<Person> findAll(List<String> ids);
+    List<PersonEntity> findAll(List<String> ids);
 
-    Person findOne(String id);
+    PersonEntity findOne(String id);
 
     long count();
 
@@ -26,9 +26,9 @@ public interface PersonRepository {
 
     long deleteAll();
 
-    Person update(Person person);
+    PersonEntity update(PersonEntity personEntity);
 
-    long update(List<Person> persons);
+    long update(List<PersonEntity> personEntities);
 
     double getAverageAge();
 

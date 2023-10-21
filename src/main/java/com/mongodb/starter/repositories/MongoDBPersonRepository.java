@@ -9,19 +9,17 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.FindOneAndReplaceOptions;
 import com.mongodb.client.model.ReplaceOneModel;
-import com.mongodb.client.model.WriteModel;
 import com.mongodb.starter.dtos.AverageAgeDTO;
-import com.mongodb.starter.models.Person;
+import com.mongodb.starter.models.PersonEntity;
+import jakarta.annotation.PostConstruct;
 import org.bson.BsonDocument;
 import org.bson.BsonNull;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Repository;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Accumulators.avg;
 import static com.mongodb.client.model.Aggregates.group;
@@ -30,7 +28,6 @@ import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.in;
 import static com.mongodb.client.model.Projections.excludeId;
 import static com.mongodb.client.model.ReturnDocument.AFTER;
-import static java.util.Arrays.asList;
 
 @Repository
 public class MongoDBPersonRepository implements PersonRepository {
@@ -41,7 +38,7 @@ public class MongoDBPersonRepository implements PersonRepository {
                                                                            .writeConcern(WriteConcern.MAJORITY)
                                                                            .build();
     private final MongoClient client;
-    private MongoCollection<Person> personCollection;
+    private MongoCollection<PersonEntity> personCollection;
 
     public MongoDBPersonRepository(MongoClient mongoClient) {
         this.client = mongoClient;
@@ -49,39 +46,39 @@ public class MongoDBPersonRepository implements PersonRepository {
 
     @PostConstruct
     void init() {
-        personCollection = client.getDatabase("test").getCollection("persons", Person.class);
+        personCollection = client.getDatabase("test").getCollection("persons", PersonEntity.class);
     }
 
     @Override
-    public Person save(Person person) {
-        person.setId(new ObjectId());
-        personCollection.insertOne(person);
-        return person;
+    public PersonEntity save(PersonEntity personEntity) {
+        personEntity.setId(new ObjectId());
+        personCollection.insertOne(personEntity);
+        return personEntity;
     }
 
     @Override
-    public List<Person> saveAll(List<Person> persons) {
+    public List<PersonEntity> saveAll(List<PersonEntity> personEntities) {
         try (ClientSession clientSession = client.startSession()) {
             return clientSession.withTransaction(() -> {
-                persons.forEach(p -> p.setId(new ObjectId()));
-                personCollection.insertMany(clientSession, persons);
-                return persons;
+                personEntities.forEach(p -> p.setId(new ObjectId()));
+                personCollection.insertMany(clientSession, personEntities);
+                return personEntities;
             }, txnOptions);
         }
     }
 
     @Override
-    public List<Person> findAll() {
+    public List<PersonEntity> findAll() {
         return personCollection.find().into(new ArrayList<>());
     }
 
     @Override
-    public List<Person> findAll(List<String> ids) {
+    public List<PersonEntity> findAll(List<String> ids) {
         return personCollection.find(in("_id", mapToObjectIds(ids))).into(new ArrayList<>());
     }
 
     @Override
-    public Person findOne(String id) {
+    public PersonEntity findOne(String id) {
         return personCollection.find(eq("_id", new ObjectId(id))).first();
     }
 
@@ -113,16 +110,17 @@ public class MongoDBPersonRepository implements PersonRepository {
     }
 
     @Override
-    public Person update(Person person) {
+    public PersonEntity update(PersonEntity personEntity) {
         FindOneAndReplaceOptions options = new FindOneAndReplaceOptions().returnDocument(AFTER);
-        return personCollection.findOneAndReplace(eq("_id", person.getId()), person, options);
+        return personCollection.findOneAndReplace(eq("_id", personEntity.getId()), personEntity, options);
     }
 
     @Override
-    public long update(List<Person> persons) {
-        List<WriteModel<Person>> writes = persons.stream()
-                                                 .map(p -> new ReplaceOneModel<>(eq("_id", p.getId()), p))
-                                                 .collect(Collectors.toList());
+    public long update(List<PersonEntity> personEntities) {
+        List<ReplaceOneModel<PersonEntity>> writes = personEntities.stream()
+                                                                   .map(p -> new ReplaceOneModel<>(eq("_id", p.getId()),
+                                                                                                   p))
+                                                                   .toList();
         try (ClientSession clientSession = client.startSession()) {
             return clientSession.withTransaction(
                     () -> personCollection.bulkWrite(clientSession, writes).getModifiedCount(), txnOptions);
@@ -131,11 +129,11 @@ public class MongoDBPersonRepository implements PersonRepository {
 
     @Override
     public double getAverageAge() {
-        List<Bson> pipeline = asList(group(new BsonNull(), avg("averageAge", "$age")), project(excludeId()));
-        return personCollection.aggregate(pipeline, AverageAgeDTO.class).first().getAverageAge();
+        List<Bson> pipeline = List.of(group(new BsonNull(), avg("averageAge", "$age")), project(excludeId()));
+        return personCollection.aggregate(pipeline, AverageAgeDTO.class).first().averageAge();
     }
 
     private List<ObjectId> mapToObjectIds(List<String> ids) {
-        return ids.stream().map(ObjectId::new).collect(Collectors.toList());
+        return ids.stream().map(ObjectId::new).toList();
     }
 }

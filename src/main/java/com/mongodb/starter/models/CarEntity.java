@@ -2,19 +2,25 @@ package com.mongodb.starter.models;
 
 import java.util.Objects;
 
-public class Car {
+public class CarEntity {
     private String brand;
     private String model;
     private Float maxSpeedKmH;
 
-    public Car() {
+    public CarEntity() {
+    }
+
+    public CarEntity(String brand, String model, Float maxSpeedKmH) {
+        this.brand = brand;
+        this.model = model;
+        this.maxSpeedKmH = maxSpeedKmH;
     }
 
     public String getBrand() {
         return brand;
     }
 
-    public Car setBrand(String brand) {
+    public CarEntity setBrand(String brand) {
         this.brand = brand;
         return this;
     }
@@ -23,7 +29,7 @@ public class Car {
         return model;
     }
 
-    public Car setModel(String model) {
+    public CarEntity setModel(String model) {
         this.model = model;
         return this;
     }
@@ -32,7 +38,7 @@ public class Car {
         return maxSpeedKmH;
     }
 
-    public Car setMaxSpeedKmH(Float maxSpeedKmH) {
+    public CarEntity setMaxSpeedKmH(Float maxSpeedKmH) {
         this.maxSpeedKmH = maxSpeedKmH;
         return this;
     }
@@ -44,13 +50,11 @@ public class Car {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        Car car = (Car) o;
-        return Objects.equals(brand, car.brand) && Objects.equals(model, car.model) && Objects.equals(maxSpeedKmH,
-                                                                                                      car.maxSpeedKmH);
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CarEntity carEntity = (CarEntity) o;
+        return Objects.equals(brand, carEntity.brand) && Objects.equals(model, carEntity.model) && Objects.equals(
+                maxSpeedKmH, carEntity.maxSpeedKmH);
     }
 
     @Override
@@ -58,4 +62,3 @@ public class Car {
         return Objects.hash(brand, model, maxSpeedKmH);
     }
 }
-
