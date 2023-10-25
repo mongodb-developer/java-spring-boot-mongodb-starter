@@ -13,7 +13,7 @@
 
 - Get started with a Free Tier Cluster on [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
 - Read this blog post: [Quick Start - Getting your Free MongoDB Atlas Cluster](https://developer.mongodb.com/quickstart/free-atlas-cluster).
-- You will need to update the default MongoDB URI `spring.data.mongodb.uri` in the `application.properties` file.
+- You will need to update the default MongoDB URI `spring.data.mongodb.uri` in the `application.properties` file or set an environment variable: `export MONGODB_URI=mongodb://localhost:27017`.
 
 ## Commands
 
