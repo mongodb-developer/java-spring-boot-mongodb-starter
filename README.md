@@ -1,5 +1,9 @@
 # Quick Start Java & MongoDB Project
 
+## Blog Post
+
+The code in this repository is discussed in [this blog post](https://www.mongodb.com/developer/code-examples/java/rest-apis-java-spring-boot/) in the [MongoDB Developer Center](https://www.mongodb.com/developer/).
+
 ## Supported versions:
 
 - Java 17
