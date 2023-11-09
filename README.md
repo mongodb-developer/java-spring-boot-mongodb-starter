@@ -27,12 +27,13 @@ The code in this repository is discussed in [this blog post](https://www.mongodb
 - You can build the project with : `mvn clean package`.
 - You can run the project with the fat jar and the embedded Tomcat: `java -jar target/java-spring-boot-mongodb-starter-1.0.0.jar` but I would use a real tomcat in production.
 
-## Swagger 3
-- Swagger 3 is already configured in this project in `SpringFoxConfig.java`.
+## Swagger & OpenAPI 3
+- springdoc-openapi java library dependency is in the `pom.xml`.
+- No configuration required.
 - The Swagger UI can be seen at [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html).
 - The JSON Open API documentation 3.0.1 is at [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs).
 - The YAML Open API documentation 3.0.1 is at [http://localhost:8080/v3/api-docs.yaml](http://localhost:8080/v3/api-docs.yaml).
-- You can also try the entire REST API directly from the Swagger interface!
+- You can also try the entire REST API directly from the Swagger web interface!
 
 ## Features showcase
 This project showcases several features of MongoDB:
